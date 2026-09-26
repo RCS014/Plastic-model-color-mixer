@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการยืม-คืนอุปกรณ์สำนักงาน (OOP Project)</title>
+    <!-- ใช้ Tailwind CSS CDN สำหรับจัดหน้าตา GUI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold"><i class="fa-solid fa-boxes-packing mr-2"></i>ระบบยืม-คืนอุปกรณ์สำนักงาน</h1>
+                <p class="text-indigo-200 text-sm">Object-Oriented Programming (OOP) Demonstration</p>
+            </div>
+            <div class="bg-indigo-700 px-4 py-2 rounded-lg text-xs">
+                <span><i class="fa-solid fa-code mr-1"></i> 6 Classes | 4 OOP Principles</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left Column: Operations Forms -->
+        <div class="space-y-6">
+            
+            <!-- Form 1: เพิ่มอุปกรณ์ใหม่ (CRUD - Create) -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-700 mb-4 flex items-center">
+                    <i class="fa-solid fa-plus-circle text-indigo-600 mr-2"></i>1. ลงทะเบียนอุปกรณ์ใหม่
+                </h2>
+                <form id="add-equipment-form" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ประเภทอุปกรณ์</label>
+                        <select id="eq-type" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-indigo-500">
+                            <option value="IT">IT Equipment (ค่าปรับ 100 บ./วัน)</option>
+                            <option value="General">General Equipment (ค่าปรับ 20 บ./วัน)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสอุปกรณ์</label>
+                        <input type="text" id="eq-id" required placeholder="เช่น EQ-101" class="w-full border rounded p-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่ออุปกรณ์</label>
+                        <input type="text" id="eq-name" required placeholder="เช่น Notebook Dell, เก้าอี้ทำงาน" class="w-full border rounded p-2 text-sm">
+                    </div>
+                    <div id="dynamic-field">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Serial Number</label>
+                        <input type="text" id="eq-extra" required placeholder="เช่น SN-998231" class="w-full border rounded p-2 text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg text-sm transition">
+                        บันทึกอุปกรณ์
+                    </button>
+                </form>
+            </div>
+
+            <!-- Form 2: เพิ่มพนักงาน -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-700 mb-4 flex items-center">
+                    <i class="fa-solid fa-user-plus text-indigo-600 mr-2"></i>2. ลงทะเบียนพนักงาน
+                </h2>
+                <form id="add-employee-form" class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสพนักงาน</label>
+                            <input type="text" id="emp-id" required placeholder="EMP-01" class="w-full border rounded p-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">แผนก</label>
+                            <input type="text" id="emp-dept" required placeholder="IT, HR, MKT" class="w-full border rounded p-2 text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ-นามสกุล</label>
+                        <input type="text" id="emp-name" required placeholder="สมชาย ใจดี" class="w-full border rounded p-2 text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-medium py-2 rounded-lg text-sm transition">
+                        เพิ่มพนักงาน
+                    </button>
+                </form>
+            </div>
+
+            <!-- Form 3: ทำรายการยืม -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-700 mb-4 flex items-center">
+                    <i class="fa-solid fa-hand-holding mr-2 text-indigo-600"></i>3. ทำรายการยืมอุปกรณ์
+                </h2>
+                <form id="borrow-form" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกผู้ยืม</label>
+                        <select id="borrow-emp-select" required class="w-full border rounded p-2 text-sm"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">เลือกอุปกรณ์ที่ว่าง</label>
+                        <select id="borrow-eq-select" required class="w-full border rounded p-2 text-sm"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ระยะเวลาที่ยืม (วัน)</label>
+                        <input type="number" id="borrow-days" value="7" min="1" required class="w-full border rounded p-2 text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm transition">
+                        ยืนยันการยืม
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Data Tables & Search -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- Table 1: รายการอุปกรณ์ทั้งหมด (Search & Read/Delete) -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
+                    <h2 class="text-lg font-bold text-slate-700"><i class="fa-solid fa-list mr-2 text-indigo-600"></i>คลังอุปกรณ์ทั้งหมด</h2>
+                    <!-- Search Box -->
+                    <input type="text" id="search-input" placeholder="ค้นหาชื่อ หรือ รหัส..." class="border rounded-lg px-3 py-1.5 text-sm w-full md:w-64 focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-500 border-b">
+                            <tr>
+                                <th class="p-2">รหัส</th>
+                                <th class="p-2">ชื่ออุปกรณ์</th>
+                                <th class="p-2">ประเภท</th>
+                                <th class="p-2">ข้อมูลเฉพาะ</th>
+                                <th class="p-2">สถานะ</th>
+                                <th class="p-2 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipment-table-body" class="divide-y">
+                            <!-- JS Inject -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table 2: ประวัติการยืม-คืน & ปุ่มคืนสินค้า (Polymorphism Demo) -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-700 mb-4"><i class="fa-solid fa-clock-rotate-left mr-2 text-indigo-600"></i>รายการยืมที่รอดำเนินการ / คืนแล้ว</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-500 border-b">
+                            <tr>
+                                <th class="p-2">Trans ID</th>
+                                <th class="p-2">ผู้ยืม</th>
+                                <th class="p-2">อุปกรณ์</th>
+                                <th class="p-2">กำหนดคืน</th>
+                                <th class="p-2">ค่าปรับ</th>
+                                <th class="p-2 text-center">การคืน</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-table-body" class="divide-y">
+                            <!-- JS Inject -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JS Logic: OOP Implementation -->
+    <script>
+        // =========================================================================
+        // 1. ABSTRACTION & ENCAPSULATION: Base Class Equipment
+        // =========================================================================
+        class Equipment {
+            #equipmentId; // Encapsulation: Private Field
+            #name;
+            #isAvailable;
+
+            constructor(equipmentId, name) {
+                if (new.target === Equipment) {
+                    throw new Error("Cannot instantiate abstract class Equipment directly."); // Abstraction
+                }
+                this.#equipmentId = equipmentId;
+                this.#name = name;
+                this.#isAvailable = true;
+            }
+
+            // Getter / Setter Methods
+            getEquipmentId() { return this.#equipmentId; }
+            getName() { return this.#name; }
+            getIsAvailable() { return this.#isAvailable; }
+            setIsAvailable(status) { this.#isAvailable = status; }
+
+            // Abstract Method
+            calculateFine(daysLate) {
+                throw new Error("Abstract method calculateFine() must be implemented.");
+            }
+
+            getType() { return "Equipment"; }
+            getDetails() { return ""; }
+        }
+
+        // =========================================================================
+        // 2. INHERITANCE & POLYMORPHISM: Derived Class 1 (ITEquipment)
+        // =========================================================================
+        class ITEquipment extends Equipment { // Inheritance
+            #serialNumber;
+
+            constructor(equipmentId, name, serialNumber) {
+                super(equipmentId, name);
+                this.#serialNumber = serialNumber;
+            }
+
+            getSerialNumber() { return this.#serialNumber; }
+
+            // Polymorphism: Overriding calculation method (100 THB/Day)
+            calculateFine(daysLate) {
+                return daysLate > 0 ? daysLate * 100 : 0;
+            }
+
+            getType() { return "IT Equipment"; }
+            getDetails() { return `SN: ${this.#serialNumber}`; }
+        }
+
+        // =========================================================================
+        // 3. INHERITANCE & POLYMORPHISM: Derived Class 2 (GeneralEquipment)
+        // =========================================================================
+        class GeneralEquipment extends Equipment { // Inheritance
+            #locationZone;
+
+            constructor(equipmentId, name, locationZone) {
+                super(equipmentId, name);
+                this.#locationZone = locationZone;
+            }
+
+            getLocationZone() { return this.#locationZone; }
+
+            // Polymorphism: Overriding calculation method (20 THB/Day)
+            calculateFine(daysLate) {
+                return daysLate > 0 ? daysLate * 20 : 0;
+            }
+
+            getType() { return "General"; }
+            getDetails() { return `Zone: ${this.#locationZone}`; }
+        }
+
+        // =========================================================================
+        // 4. CLASS: Employee
+        // =========================================================================
+        class Employee {
+            #empId;
+            #name;
+            #department;
+
+            constructor(empId, name, department) {
+                this.#empId = empId;
+                this.#name = name;
+                this.#department = department;
+            }
+
+            getEmpId() { return this.#empId; }
+            getName() { return this.#name; }
+            getDepartment() { return this.#department; }
+            getFullInfo() { return `${this.#name} (${this.#department})`; }
+        }
+
+        // =========================================================================
+        // 5. CLASS: BorrowTransaction
+        // =========================================================================
+        class BorrowTransaction {
+            #transId;
+            #employee;
+            #equipment;
+            #borrowDate;
+            #dueDate;
+            #returnDate;
+            #fineAmount;
+
+            constructor(transId, employee, equipment, daysToBorrow = 7) {
+                this.#transId = transId;
+                this.#employee = employee;
+                this.#equipment = equipment;
+                this.#borrowDate = new Date();
+                
+                const due = new Date();
+                due.setDate(due.getDate() + parseInt(daysToBorrow));
+                this.#dueDate = due;
+                
+                this.#returnDate = null;
+                this.#fineAmount = 0;
+
+                // เปลี่ยนสถานะอุปกรณ์เป็นถูกยืมแล้ว
+                this.#equipment.setIsAvailable(false);
+            }
+
+            getTransId() { return this.#transId; }
+            getEmployee() { return this.#employee; }
+            getEquipment() { return this.#equipment; }
+            getDueDate() { return this.#dueDate; }
+            getReturnDate() { return this.#returnDate; }
+            getFineAmount() { return this.#fineAmount; }
+
+            // คืนอุปกรณ์ + คำนวณค่าปรับด้วย Polymorphism
+            processReturn(simulatedDaysLate = 0) {
+                this.#returnDate = new Date();
+                this.#equipment.setIsAvailable(true); // ปล่อยให้อุปกรณ์ว่าง
+
+                // ใช้ Polymorphism เรียก calculateFine ตาม Dynamic Type ของอุปกรณ์
+                this.#fineAmount = this.#equipment.calculateFine(simulatedDaysLate);
+                return this.#fineAmount;
+            }
+        }
+
+        // =========================================================================
+        // 6. CLASS: EquipmentManager (Manager / Controller Class)
+        // =========================================================================
+        class EquipmentManager {
+            #equipments = [];
+            #employees = [];
+            #transactions = [];
+
+            addEquipment(equipment) {
+                this.#equipments.push(equipment);
+            }
+
+            removeEquipment(id) {
+                this.#equipments = this.#equipments.filter(e => e.getEquipmentId() !== id);
+            }
+
+            addEmployee(employee) {
+                this.#employees.push(employee);
+            }
+
+            getEquipments() { return this.#equipments; }
+            getEmployees() { return this.#employees; }
+            getTransactions() { return this.#transactions; }
+
+            searchEquipment(keyword) {
+                keyword = keyword.toLowerCase();
+                return this.#equipments.filter(e => 
+                    e.getName().toLowerCase().includes(keyword) || 
+                    e.getEquipmentId().toLowerCase().includes(keyword)
+                );
+            }
+
+            createTransaction(empId, eqId, days) {
+                const emp = this.#employees.find(e => e.getEmpId() === empId);
+                const eq = this.#equipments.find(e => e.getEquipmentId() === eqId);
+
+                if (emp && eq && eq.getIsAvailable()) {
+                    const transId = "TX-" + (this.#transactions.length + 101);
+                    const tx = new BorrowTransaction(transId, emp, eq, days);
+                    this.#transactions.push(tx);
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        // =========================================================================
+        // GUI CONTROLLER & DOM EVENTS
+        // =========================================================================
+        const manager = new EquipmentManager();
+
+        // Mock Initial Data
+        manager.addEquipment(new ITEquipment("IT-01", "MacBook Pro M2", "SN-882319"));
+        manager.addEquipment(new ITEquipment("IT-02", "iPad Air 5", "SN-110293"));
+        manager.addEquipment(new GeneralEquipment("GE-01", "เก้าอี้เพื่อสุขภาพ", "Zone A"));
+        manager.addEquipment(new GeneralEquipment("GE-02", "เครื่องเคลือบบัตร", "Zone B"));
+
+        manager.addEmployee(new Employee("EMP-01", "สมชาย เข็มกลัด", "IT Support"));
+        manager.addEmployee(new Employee("EMP-02", "วิภาดา รักดี", "HR Manager"));
+
+        // DOM Elements
+        const eqTypeSelect = document.getElementById('eq-type');
+        const dynamicField = document.getElementById('dynamic-field');
+        const addEqForm = document.getElementById('add-equipment-form');
+        const addEmpForm = document.getElementById('add-employee-form');
+        const borrowForm = document.getElementById('borrow-form');
+        const searchInput = document.getElementById('search-input');
+
+        // Toggle Form Field based on selected Equipment Type
+        eqTypeSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'IT') {
+                dynamicField.innerHTML = `
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Serial Number</label>
+                    <input type="text" id="eq-extra" required placeholder="เช่น SN-998231" class="w-full border rounded p-2 text-sm">
+                `;
+            } else {
+                dynamicField.innerHTML = `
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">โซนจัดเก็บ</label>
+                    <input type="text" id="eq-extra" required placeholder="เช่น Zone A, ห้องประชุม 2" class="w-full border rounded p-2 text-sm">
+                `;
+            }
+        });
+
+        // Form 1 Submit: Add Equipment
+        addEqForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const type = document.getElementById('eq-type').value;
+            const id = document.getElementById('eq-id').value;
+            const name = document.getElementById('eq-name').value;
+            const extra = document.getElementById('eq-extra').value;
+
+            if (type === 'IT') {
+                manager.addEquipment(new ITEquipment(id, name, extra));
+            } else {
+                manager.addEquipment(new GeneralEquipment(id, name, extra));
+            }
+
+            addEqForm.reset();
+            renderAll();
+        });
+
+        // Form 2 Submit: Add Employee
+        addEmpForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('emp-id').value;
+            const name = document.getElementById('emp-name').value;
+            const dept = document.getElementById('emp-dept').value;
+
+            manager.addEmployee(new Employee(id, name, dept));
+            addEmpForm.reset();
+            renderAll();
+        });
+
+        // Form 3 Submit: Borrow Item
+        borrowForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const empId = document.getElementById('borrow-emp-select').value;
+            const eqId = document.getElementById('borrow-eq-select').value;
+            const days = document.getElementById('borrow-days').value;
+
+            if (manager.createTransaction(empId, eqId, days)) {
+                renderAll();
+            } else {
+                alert('ไม่สามารถยืมได้');
+            }
+        });
+
+        // Search Input Event
+        searchInput.addEventListener('input', (e) => {
+            renderEquipmentTable(manager.searchEquipment(e.target.value));
+        });
+
+        // Delete Equipment
+        window.deleteEq = function(id) {
+            if (confirm(`คุณต้องการลบอุปกรณ์รหัส ${id} หรือไม่?`)) {
+                manager.removeEquipment(id);
+                renderAll();
+            }
+        };
+
+        // Return Item with Polymorphism Calculation Prompt
+        window.returnItem = function(transId) {
+            const tx = manager.getTransactions().find(t => t.getTransId() === transId);
+            if (tx) {
+                const daysLate = prompt("ระบุจำนวนวันที่ส่งคืนช้าเกินกำหนด (วัน) เพื่อทดสอบการคำนวณค่าปรับ Polymorphism:", "0");
+                if (daysLate !== null) {
+                    const fine = tx.processReturn(parseInt(daysLate) || 0);
+                    alert(`คืนอุปกรณ์เรียบร้อย!\nประเภท: ${tx.getEquipment().getType()}\nค่าปรับคงเหลือ: ${fine} บาท`);
+                    renderAll();
+                }
+            }
+        };
+
+        // Render Tables & Options
+        function renderEquipmentTable(list = manager.getEquipments()) {
+            const tbody = document.getElementById('equipment-table-body');
+            tbody.innerHTML = list.map(eq => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-2 font-mono text-xs">${eq.getEquipmentId()}</td>
+                    <td class="p-2 font-medium">${eq.getName()}</td>
+                    <td class="p-2"><span class="px-2 py-0.5 rounded text-xs ${eq.getType() === 'IT Equipment' ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'}">${eq.getType()}</span></td>
+                    <td class="p-2 text-xs text-slate-500">${eq.getDetails()}</td>
+                    <td class="p-2">
+                        ${eq.getIsAvailable() 
+                            ? '<span class="text-emerald-600 text-xs font-bold"><i class="fa-solid fa-circle-check mr-1"></i>ว่าง</span>' 
+                            : '<span class="text-rose-500 text-xs font-bold"><i class="fa-solid fa-circle-xmark mr-1"></i>ถูกยืม</span>'}
+                    </td>
+                    <td class="p-2 text-center">
+                        <button onclick="deleteEq('${eq.getEquipmentId()}')" class="text-rose-500 hover:text-rose-700 text-xs">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderSelectOptions() {
+            const empSelect = document.getElementById('borrow-emp-select');
+            const eqSelect = document.getElementById('borrow-eq-select');
+
+            empSelect.innerHTML = manager.getEmployees().map(emp => 
+                `<option value="${emp.getEmpId()}">${emp.getFullInfo()}</option>`
+            ).join('');
+
+            const availableEq = manager.getEquipments().filter(e => e.getIsAvailable());
+            eqSelect.innerHTML = availableEq.map(eq => 
+                `<option value="${eq.getEquipmentId()}">${eq.getName()} (${eq.getEquipmentId()})</option>`
+            ).join('');
+        }
+
+        function renderTransactionTable() {
+            const tbody = document.getElementById('transaction-table-body');
+            tbody.innerHTML = manager.getTransactions().map(tx => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-2 font-mono text-xs">${tx.getTransId()}</td>
+                    <td class="p-2">${tx.getEmployee().getName()}</td>
+                    <td class="p-2">${tx.getEquipment().getName()}</td>
+                    <td class="p-2 text-xs">${tx.getDueDate().toLocaleDateString('th-TH')}</td>
+                    <td class="p-2 font-semibold ${tx.getFineAmount() > 0 ? 'text-rose-600' : 'text-slate-600'}">${tx.getFineAmount()} บ.</td>
+                    <td class="p-2 text-center">
+                        ${tx.getReturnDate() === null 
+                            ? `<button onclick="returnItem('${tx.getTransId()}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs px-2 py-1 rounded">คืนอุปกรณ์</button>`
+                            : `<span class="text-xs text-slate-400">คืนแล้ว</span>`}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAll() {
+            renderEquipmentTable();
+            renderSelectOptions();
+            renderTransactionTable();
+        }
+
+        // Run Initial Render
+        renderAll();
+    </script>
+</body>
+</html>
